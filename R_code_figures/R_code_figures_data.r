@@ -1,9 +1,9 @@
-#script used to generate figures for the publication Soil microbial diversity across tropical savanna ecosystems"
+#script used to generate figures for the publication "Driving forces of microbial communities in tropical savanna ecosystems"
 #responsible code author: Lea Nosalova
-#this script is the first version, used to analyse and present the data
+#this script is the second version, used to analyse and present the data
 
 
-#to configurate the working space
+#to configure the working space
 # INIT ----
 rm(list=ls())
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #always set current dir as WD
@@ -170,36 +170,42 @@ bptest(anova)
 
 #plot indexes
 grid.arrange(p1, p2, p3, nrow = 1)
-p1 <- ggplot(my_data_cleaned, aes(x = sampling_point, y = Observed, fill = sampling_point)) + 
+p1 <- ggplot(my_data, aes(x = sampling_point, y = Observed, fill = sampling_point)) + 
   geom_boxplot(coef = 1.5) + 
-  labs(x="", y="Richness (Observed ASV)") +
+  labs(x="", y="Richness (observed ASV)") +
   theme_bw() +
+  theme(axis.title.y = element_text(size = 15),
+        axis.text = element_text(size = 15)) +
   theme(legend.position="none") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  geom_text(data = Tk, aes(x = sampling_point, y = quant  + 170 , label = cld), 
-            size = 3, vjust = -1, hjust = 0.5) +
+  geom_text(data = Tk_observed_all, aes(x = sampling_point, y = quant  + 170 , label = cld), 
+            size = 5, vjust = -1, hjust = 0.5) +
   scale_fill_manual(values =  cbPalette) +
   scale_x_discrete(labels = NULL)
-p2 <- ggplot(my_data_cleaned, aes(x = sampling_point, y = Shannon, fill = sampling_point)) + 
+p2 <- ggplot(my_data, aes(x = sampling_point, y = Shannon, fill = sampling_point)) + 
   geom_boxplot(coef = 1.5) + 
   labs(x="", y="Shannon index") +
   theme_bw() +
+  theme(axis.title.y = element_text(size = 15),
+        axis.text = element_text(size = 15)) +
   theme(legend.position="none") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  geom_text(data = Tk, aes(x = sampling_point, y = quant  + 0.35 , label = cld), 
-            size = 3, vjust = -1, hjust = 0.1) +
+  geom_text(data = Tk_shannon_all, aes(x = sampling_point, y = quant  + 0.35 , label = cld), 
+            size = 5, vjust = -1, hjust = 0.1) +
   scale_fill_manual(values =  cbPalette) +
   scale_x_discrete(labels = NULL)
-p3 <- ggplot(my_data_cleaned, aes(x = sampling_point, y = InvSimpson, fill = sampling_point)) + 
+p3 <- ggplot(my_data, aes(x = sampling_point, y = InvSimpson, fill = sampling_point)) + 
   geom_boxplot(coef = 1.5) + 
   labs(x="", y="Inverse Simpson index") +
   theme_bw() +
+  theme(axis.title.y = element_text(size = 15),
+        axis.text = element_text(size = 15)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  geom_text(data = Tk, aes(x = sampling_point, y = quant + 110, label = cld), 
-            size = 3, vjust = -1, hjust = 0.5) +
+  geom_text(data = Tk_InvSimpson_all, aes(x = sampling_point, y = quant + 110, label = cld), 
+            size = 5, vjust = -1, hjust = 0.5) +
   scale_fill_manual(
     values = cbPalette,
-    labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (site Satara)", "South Africa 2 (site Skukuza)" )
+    labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (Satara site)", "South Africa 2 (Skukuza site)" )
   ) +
   scale_x_discrete(labels = NULL) +
   theme(legend.position = "right" )
@@ -261,7 +267,7 @@ p1 <- ggplot(my_data_cleaned, aes(x = sampling_point, y = InvSimpson, fill = fac
             size = 3, vjust = -1, hjust = 0.5) +
   scale_fill_manual(values =  palett_group) +
   #scale_x_discrete(labels = NULL)
-  scale_x_discrete(labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (site Satara)", "South Africa 2 (site Skukuza)"))+
+  scale_x_discrete(labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (Satara site)", "South Africa 2 (Skukuza site)"))+
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
   theme(legend.position = "right", legend.title = element_blank()  )
 p1  
@@ -307,8 +313,8 @@ print(y_label)
 names <- c( "burkina_faso" = "Burkina Faso",
             "colombia" = "Colombia",
             "ivory_coast" = "Ivory Coast",
-            "satara" = "South Africa 1 (site Satara)",
-            "skukuza" = "South Africa 2 (site Skukuza)",
+            "satara" = "South Africa 1 (Satara site)",
+            "skukuza" = "South Africa 2 (Skukuza site)",
             "namibia" = "Namibia")
 
 #plot the results
@@ -540,8 +546,8 @@ z_scaled_func <- z_scaled_func[original_order[original_order %in% rownames(z_sca
 names <- c( "burkina_faso" = "Burkina Faso",
             "colombia" = "Colombia",
             "ivory_coast" = "Ivory Coast",
-            "satara" = "South Africa 1 (site Satara)",
-            "skukuza" = "South Africa 2 (site Skukuza)",
+            "satara" = "South Africa 1 (Satara site)",
+            "skukuza" = "South Africa 2 (Skukuza site)",
             "namibia" = "Namibia")
 colnames(z_scaled_func) <- names[colnames(z_scaled_func)]
 
@@ -656,7 +662,7 @@ transf_alpha_div <- cbind(Sample_ID, sampling_point, alpha.div_norm)
 merged_data_env_div <- merge(transf_alpha_div, env, by = "Sample_ID")
 
 merged_data_env_div <- read_csv("RESULTS/merged_data_env_div.csv")
-my_data <- select(merged_data_env_div, Observed, Shannon, InvSimpson, pH, organic_matter, organic_C, available_P, total_N, organic_C_N_ratio)
+my_data <- select(merged_data_env_div, Observed, Shannon, InvSimpson, pH, organic_matter, organic_C, available_P, total_N, organic_C_N_ratio, clay, sand)
 cor_1 <- cor(my_data, method = "spearman")
 cor_2 <- rcorr(as.matrix(my_data, method = "spearman"))
 cor_p <- cor_2$P
@@ -671,7 +677,7 @@ write.table(cor_n_df, file = "spearman_cor_n_out2.txt", row.names = FALSE, col.n
 
 #for each sampling_point separately
 my_data_selected <- dplyr::select(my_data, Observed, Shannon, InvSimpson, pH, organic_matter, 
-                           organic_C, available_P, total_N, organic_C_N_ratio, sampling_point)
+                           organic_C, available_P, total_N, clay, sand, organic_C_N_ratio, sampling_point)
 unique_sampling_points <- unique(my_data_selected$sampling_point)
 cor_p_list <- list()
 cor_r_list <- list()
@@ -698,9 +704,9 @@ for (point in unique_sampling_points) {
 
 
 #to show only significant 
-k <- ggplot(filtered_data, aes(pH, Shannon, color = sampling_point)) +
+k <- ggplot(filtered_data, aes(sand, Observed, color = sampling_point)) +
   geom_point() +
-  labs(x = "Organic C [%]", y = "Inverse Simpson index") +
+  labs(x = "Sand [%]", y = "Richness (Observed ASV)") +
   stat_smooth(aes(fill = sampling_point, color = sampling_point), method = "lm", formula = model) +
   stat_poly_eq(
     aes(label = paste( ..p.value.label.., ..rr.label.., sep = "~~~~")), 
@@ -716,7 +722,7 @@ k <- ggplot(filtered_data, aes(pH, Shannon, color = sampling_point)) +
   theme_bw()
 
 k
-
+#to select only significant
 selected_sampling_points <- c("namibia", "ivory_coast", "colombia", "burkina_faso", "satara", "skukuza")
 filtered_data <- my_data[my_data$sampling_point %in% selected_sampling_points, ]
 
@@ -774,15 +780,17 @@ summary(step.model$finalModel)
 #regression coeficients
 coef(step.model$finalModel, 4)
 
-final_model_fit <- lm((InvSimpson) ~  pH +  organic_C + total_N +  organic_C_N_ratio +  sampling_point + pH:sampling_point +
-                        organic_C:sampling_point + total_N:sampling_point + organic_C_N_ratio:sampling_point,  data = my_data)
+final_model_fit <- lm((Observed) ~  pH +  organic_C + total_N +  organic_C_N_ratio  + clay + sand + sampling_point + pH:sampling_point +
+                        organic_C:sampling_point + total_N:sampling_point + organic_C_N_ratio:sampling_point + clay:sampling_point +
+                        sand:sampling_point,  data = my_data)
 
 summary(final_model_fit)
 
 stepwise_model <- stepAIC(final_model_fit, direction = "both")
 
 #choose the best option
-final_model_fit <- lm((InvSimpson) ~ total_N + sampling_point + total_N:sampling_point,  data = my_data)
+final_model_fit <- lm((Observed) ~ pH + clay + sand + sampling_point + pH:sampling_point + organic_C:sampling_point + 
+                        total_N:sampling_point + organic_C_N_ratio:sampling_point, data = my_data)
 
 par(mfrow=c(2,3))
 plot(final_model_fit)
@@ -895,7 +903,7 @@ ps_grouped <- ps_grouped %>%
 #plot relative abundance at phylum, grouped by sampling point
 p <-ggplot(ps_grouped, aes(x = sampling_point, y = Relative_abundance, fill = (Phylum ))) +
   geom_bar(stat = "identity", position = "stack") +
-  scale_x_discrete(labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (site Satara)", "South Africa 2 (site Skukuza)")) +
+  scale_x_discrete(labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (Satara site)", "South Africa 2 (Skukuza site)")) +
   scale_fill_manual(values = c( "#99cc99","#cc6666","orchid4",  "#E69F00","gold1","darkcyan", "lightpink", "#ff9966",  "#56B4E9",
                                 "springgreen4", "firebrick","#666666","lightblue", "mediumvioletred", 
                                   "#99cc00",   "darkblue")) +
@@ -957,7 +965,7 @@ ps_grouped <- ps_grouped %>%
 #plot relative abundance at Class, grouped by sampling point
 p <- ggplot(ps_grouped, aes(x = sampling_point, y = Relative_abundance, fill = Class)) +
   geom_bar(stat = "identity", position = "stack") +
-  scale_x_discrete(labels = c( "Burkina Faso","Colombia","Ivory Coast", "Namibia","South Africa 1 (site Satara)","South Africa 2 (site Skukuza)")) +
+  scale_x_discrete(labels = c( "Burkina Faso","Colombia","Ivory Coast", "Namibia","South Africa 1 (Satara site)","South Africa 2 (Skukuza site)")) +
   scale_fill_manual(values = c("#cc6666", "springgreen4", "#ff9966", "orchid4", "mediumvioletred","lightpink", "#99cc00", "darkblue", "gold1","darkcyan",
                               "lightblue" ,"firebrick", "#E69F00","#99cc99", "#56B4E9","#666666")) +
   theme_minimal() +
@@ -995,7 +1003,7 @@ taxa_abund_hellinger <- as.data.frame(t(taxa_abund_hellinger))
 dim(taxa_abund_hellinger)
 
 #standardize env variables
-env_vars <- c("pH", "total_N", "organic_C", "organic_matter", "organic_C_N_ratio")
+env_vars <- c("pH", "total_N", "organic_C", "organic_matter", "organic_C_N_ratio", "clay", "sand")
 env <- metadata[, env_vars]
 env$Sample_ID <- metadata$Sample_ID
 rownames(env) <- env$Sample_ID
@@ -1024,7 +1032,8 @@ model <- ordiR2step(dbrda_lwr, #lower model limit
 
 model$call
 
-dbrda_final <- capscale(formula = taxa_abund_hellinger ~ pH +  organic_matter + organic_C_N_ratio, data = data.frame(env_stand), distance = "bray")
+dbrda_final <- capscale(formula = taxa_abund_hellinger ~   sand + pH +  
+                          organic_C_N_ratio + organic_matter , data = data.frame(env_stand), distance = "bray")
 summary(dbrda_final)
 
 vif_values <- vif.cca(dbrda_final)
@@ -1083,7 +1092,7 @@ points(sc_si, pch = 21,  bg = palette_specific[sites], cex = 0.8)
 
 set.seed(123)
 #extract env variables
-envfit_res <- envfit(dbrda_final ~ pH + organic_C_N_ratio + organic_matter, data = env_stand, permutations = 999)
+envfit_res <- envfit(dbrda_final ~ pH + total_N + sand + organic_C_N_ratio, data = env_stand, permutations = 999)
 envfit_res
 envfit_df <- as.data.frame(scores(envfit_res, display = "vectors"))
 envfit_df$Variable <- rownames(envfit_df)
@@ -1113,7 +1122,7 @@ phylum_avg <- phylum_scores %>%
     CAP1 = mean(CAP1, na.rm = TRUE),
     CAP2 = mean(CAP2, na.rm = TRUE)) %>%
   mutate(arrow_length = sqrt(CAP1^2 + CAP2^2)) %>%
-  filter(arrow_length > 0.3) 
+  filter(arrow_length > 0.5) 
 
 #plot phyla arrows
 arrows(0, 0, phylum_avg$CAP1, phylum_avg$CAP2, col = "red", lwd = 1, length = 0.1)
