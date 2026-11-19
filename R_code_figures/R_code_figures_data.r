@@ -26,7 +26,7 @@ temp_pp <- raster::stack(path)
 names(temp_pp) <- c("temperature", "precipitation")
 
 #add locations
-my_sites <- data.frame(site = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia","South Africa site 1 (Skukuza)", "South Africa site 2 (Satara)"),
+my_sites <- data.frame(site = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia","South Africa - site Satara)", "South Africa - site Skukuza"),
                        lon = c(-4.340744, -71.337413, -5.0217472, 18.447108, 31.766753, 31.778191),
                        lat = c(11.087943, 4.572624, 6.2312639, -23.220712, -24.966832, -24.393179))
 
@@ -56,16 +56,16 @@ whittaker_base_plot() +
   # add the temperature - precipitation data points
   geom_point(data = extractions,
              aes(x = temperature,
-                 y = precipitation,
-             size = 3,
-             shape = 21) +
+                 y = precipitation, color = site),
+             size = 4,
+             shape = 19) +
   geom_point(data = extractions,
              aes(x = temperature,
                  y = precipitation,
                  color = site),
-             shape = 16,
-             size  = 3) +
-  theme_bw() + 
+             shape = 19,
+             size = 3) +
+  theme_bw() +
   scale_colour_manual(values = cbPalette) 
 
 
@@ -179,7 +179,7 @@ p1 <- ggplot(my_data, aes(x = sampling_point, y = Observed, fill = sampling_poin
   theme(legend.position="none") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   geom_text(data = Tk_observed_all, aes(x = sampling_point, y = quant  + 170 , label = cld), 
-            size = 5, vjust = -1, hjust = 0.5) +
+            size = 3, vjust = -1, hjust = 0.5) +
   scale_fill_manual(values =  cbPalette) +
   scale_x_discrete(labels = NULL)
 p2 <- ggplot(my_data, aes(x = sampling_point, y = Shannon, fill = sampling_point)) + 
@@ -191,7 +191,7 @@ p2 <- ggplot(my_data, aes(x = sampling_point, y = Shannon, fill = sampling_point
   theme(legend.position="none") +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   geom_text(data = Tk_shannon_all, aes(x = sampling_point, y = quant  + 0.35 , label = cld), 
-            size = 5, vjust = -1, hjust = 0.1) +
+            size = 3, vjust = -1, hjust = 0.1) +
   scale_fill_manual(values =  cbPalette) +
   scale_x_discrete(labels = NULL)
 p3 <- ggplot(my_data, aes(x = sampling_point, y = InvSimpson, fill = sampling_point)) + 
@@ -202,10 +202,10 @@ p3 <- ggplot(my_data, aes(x = sampling_point, y = InvSimpson, fill = sampling_po
         axis.text = element_text(size = 15)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   geom_text(data = Tk_InvSimpson_all, aes(x = sampling_point, y = quant + 110, label = cld), 
-            size = 5, vjust = -1, hjust = 0.5) +
+            size = 3, vjust = -1, hjust = 0.5) +
   scale_fill_manual(
     values = cbPalette,
-    labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (Satara site)", "South Africa 2 (Skukuza site)" )
+    labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa - site Satara", "South Africa site Skukuza" )
   ) +
   scale_x_discrete(labels = NULL) +
   theme(legend.position = "right" )
@@ -295,7 +295,17 @@ sampledf_bact = data.frame(sample_data(physeq_transformed_Bact_Arch))
 grouping_factor <- sampledf_bact$sampling_point 
 anosim_result <- anosim(dist_matrix, grouping_factor, permutations = 999)
 print(anosim_result)
+                                                       
+#significance of dissimilarity (PERMANOVA)
+permanova_result <- vegan::adonis2(dist_matrix ~ sampling_point, data = sampledf_bact, permutations = 999)
+print(permanova_result)
 
+R2 <- permanova_result$R2[1]
+p_value <- permanova_result$`Pr(>F)`[1]
+
+print(R2)
+print(p_value)
+                                                       
 bray_PCoA_ordination <- ordinate(physeq = physeq_transformed_Bact_Arch, method = "PCoA", distance = bray_PCoA)
 #extract PCoA values for plotting them on the axis labels
 eig_values <- bray_PCoA_ordination$values$Eigenvalues
@@ -313,8 +323,8 @@ print(y_label)
 names <- c( "burkina_faso" = "Burkina Faso",
             "colombia" = "Colombia",
             "ivory_coast" = "Ivory Coast",
-            "satara" = "South Africa 1 (Satara site)",
-            "skukuza" = "South Africa 2 (Skukuza site)",
+            "satara" = "South Africa - site Satara",
+            "skukuza" = "South Africa - site Skukuza",
             "namibia" = "Namibia")
 
 #plot the results
@@ -361,7 +371,7 @@ out <- ancombc2(
   fix_formula = "sampling_point", 
   rand_formula = NULL, 
   p_adj_method = "holm", 
-  tax_level = "Family", prv_cut = 0.2, s0_perc = 0.05, struc_zero = TRUE, neg_lb = TRUE,
+  tax_level = "Class", prv_cut = 0.2, s0_perc = 0.05, struc_zero = TRUE, neg_lb = TRUE,
   group = "sampling_point", pairwise = TRUE, mdfdr_control = list(fwer_ctrl_method = "holm", B = 1000),
   alpha = 0.05, 
   n_cl = 12,
@@ -506,7 +516,7 @@ fig_pair <- df_fig_pair1 %>%
   scale_fill_gradient2(low = "blue", high = "red", mid = "white",
                        na.value = "white", midpoint = mid, limit = c(lo, up),
                        name = NULL) +
-  geom_text(aes(label = label), size = 2.5) +
+  geom_text(aes(label = label), size = 4.5) +
   labs(x = NULL, y = NULL, title = "") +
   theme_minimal() +
   theme(axis.text.x = element_text(size = 6.5))+
@@ -546,8 +556,8 @@ z_scaled_func <- z_scaled_func[original_order[original_order %in% rownames(z_sca
 names <- c( "burkina_faso" = "Burkina Faso",
             "colombia" = "Colombia",
             "ivory_coast" = "Ivory Coast",
-            "satara" = "South Africa 1 (Satara site)",
-            "skukuza" = "South Africa 2 (Skukuza site)",
+            "satara" = "South Africa - site Satara",
+            "skukuza" = "South Africa - site Skukuza",
             "namibia" = "Namibia")
 colnames(z_scaled_func) <- names[colnames(z_scaled_func)]
 
@@ -582,8 +592,8 @@ labels <- c("burkina_faso" = "Burkina Faso",
             "colombia" = "Colombia",
             "ivory_coast" = "Ivory Coast",
             "namibia" = "Namibia",
-            "satara" = "South Africa 1 (site Satara)",
-            "skukuza" = "South Africa 2 (site Skukuza)")
+            "satara" = "South Africa - site Satara",
+            "skukuza" = "South Africa - site Skukuza")
 
 # Create the PCA plot with arrows
 p <- ggplot(pca_scores, aes(x = PC1, y = PC2, color=sampling_point)) +
@@ -591,7 +601,6 @@ p <- ggplot(pca_scores, aes(x = PC1, y = PC2, color=sampling_point)) +
   theme_bw() +
   labs(title = "", x = x_label, y = y_label) +
   theme(legend.position = "right") +
-  #annotate('text', label = expression(italic("R"^2) ~ "= 0.839, p-value < 0.001"), x = 0.05, y = 0.25, size =3) +
   scale_color_manual(values = cbPalette, labels = labels) +
   scale_fill_manual(values = cbPalette, labels = labels) +
   geom_vline(aes(xintercept = 0), linetype = "dotted", linewidth = 0.7) +
@@ -647,14 +656,14 @@ library(PerformanceAnalytics)
 #first remove <LD from datase
 table_environ <- readRDS(metadata_file)
 table_environ$available_P[table_environ$available_P < 3.71] <- NA
-env.bio <- table_environ[, c(17:22)]
+env.bio <- table_environ[, c(17:24)]
 Sample_ID <- table_environ$Sample_ID
 sampling_point <- table_environ$sampling_point
 env <- cbind(Sample_ID, sampling_point, env.bio)
 
 #outliers as NA (outlier were identified by Tueky method)
 table_alpha_diversity <- alpha_diversity
-alpha.div <- table_alpha_diversity[, c(23,24, 26:28)]
+alpha.div <- table_alpha_diversity[, c(1, 28:30)]
 Sample_ID <- table_alpha_diversity$Sample_ID
 sampling_point <- table_alpha_diversity$sampling_point
 transf_alpha_div <- cbind(Sample_ID, sampling_point, alpha.div_norm)
@@ -664,7 +673,7 @@ merged_data_env_div <- merge(transf_alpha_div, env, by = "Sample_ID")
 merged_data_env_div <- read_csv("RESULTS/merged_data_env_div.csv")
 my_data <- select(merged_data_env_div, Observed, Shannon, InvSimpson, pH, organic_matter, organic_C, available_P, total_N, organic_C_N_ratio, clay, sand)
 cor_1 <- cor(my_data, method = "spearman")
-cor_2 <- rcorr(as.matrix(my_data, method = "spearman"))
+cor_2 <- rcorr(as.matrix(my_data), type = "spearman"))
 cor_p <- cor_2$P
 cor_p_df <- data.frame(cor_p)
 write.table(cor_p_df, file = "spearman_cor_p_out2.txt", row.names = FALSE, col.names = TRUE, sep = "\t")
@@ -704,17 +713,17 @@ for (point in unique_sampling_points) {
 
 
 #to show only significant 
-k <- ggplot(filtered_data, aes(sand, Observed, color = sampling_point)) +
+k <- ggplot(filtered_data, aes(organic_C_N_ratio, Observed, color = sampling_point)) +
   geom_point() +
-  labs(x = "Sand [%]", y = "Richness (Observed ASV)") +
+  labs(x = "organic C:total N ratio", y = "Richness (Observed ASV)") +
   stat_smooth(aes(fill = sampling_point, color = sampling_point), method = "lm", formula = model) +
   stat_poly_eq(
     aes(label = paste( ..p.value.label.., ..rr.label.., sep = "~~~~")), 
     rsquared.conf.level = 0.95,
     formula = model, 
     size = 3,
-    label.x = "left",  
-    label.y = "bottom",
+    label.x = "right",  
+    label.y = "top",
   ) +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_color_manual(values = palette_specific) +  
@@ -722,6 +731,7 @@ k <- ggplot(filtered_data, aes(sand, Observed, color = sampling_point)) +
   theme_bw()
 
 k
+grid.arrange(k1, k2, k3, k4, nrow = 2)
 #to select only significant
 selected_sampling_points <- c("namibia", "ivory_coast", "colombia", "burkina_faso", "satara", "skukuza")
 filtered_data <- my_data[my_data$sampling_point %in% selected_sampling_points, ]
@@ -756,6 +766,10 @@ leveneTest(residuals(model) ~ alpha_diversity$sampling_point)
 #https://www.sthda.com/english/articles/37-model-selection-essentials-in-r/154-stepwise-regression-essentials-in-r/
 #fit the full model 
 #use data from previous step
+y_data <- dplyr::select(merged_data_env_div, Shannon,  pH, 
+                                  organic_C,  total_N, organic_C_N_ratio, clay, sand, sampling_point)
+my_data_clean <- na.omit(my_data)
+
 full.model <- lm((InvSimpson) ~., data = my_data)
 step.model <- stepAIC(full.model, direction = "both",  trace = FALSE)
 
@@ -764,7 +778,7 @@ summary(step.model)
 
 #model using traincontrol 
 train.control <- trainControl(method = "cv", number = 10)
-step.model <- train((InvSimpson) ~., data = my_data, na.rm = TRUE,
+step.model <- train((Observed) ~., data = my_data, na.rm = TRUE,
                     method = "leapSeq", 
                     tuneGrid = data.frame(nvmax = 1:5),
                     trControl = train.control)
@@ -778,7 +792,7 @@ step.model$finalModel
 summary(step.model$finalModel)
 
 #regression coeficients
-coef(step.model$finalModel, 4)
+coef(step.model$finalModel, 5)
 
 final_model_fit <- lm((Observed) ~  pH +  organic_C + total_N +  organic_C_N_ratio  + clay + sand + sampling_point + pH:sampling_point +
                         organic_C:sampling_point + total_N:sampling_point + organic_C_N_ratio:sampling_point + clay:sampling_point +
@@ -789,7 +803,8 @@ summary(final_model_fit)
 stepwise_model <- stepAIC(final_model_fit, direction = "both")
 
 #choose the best option
-final_model_fit <- lm((Observed) ~ pH + clay + sand + sampling_point + pH:sampling_point + organic_C:sampling_point + 
+final_model_fit <- lm((Observed) ~ pH + organic_C + total_N + organic_C_N_ratio + clay + 
+                        sand + sampling_point + pH:sampling_point + organic_C:sampling_point + 
                         total_N:sampling_point + organic_C_N_ratio:sampling_point, data = my_data)
 
 par(mfrow=c(2,3))
@@ -903,7 +918,7 @@ ps_grouped <- ps_grouped %>%
 #plot relative abundance at phylum, grouped by sampling point
 p <-ggplot(ps_grouped, aes(x = sampling_point, y = Relative_abundance, fill = (Phylum ))) +
   geom_bar(stat = "identity", position = "stack") +
-  scale_x_discrete(labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa 1 (Satara site)", "South Africa 2 (Skukuza site)")) +
+  scale_x_discrete(labels = c("Burkina Faso", "Colombia", "Ivory Coast", "Namibia", "South Africa - site Satara", "South Africa - site Skukuza")) +
   scale_fill_manual(values = c( "#99cc99","#cc6666","orchid4",  "#E69F00","gold1","darkcyan", "lightpink", "#ff9966",  "#56B4E9",
                                 "springgreen4", "firebrick","#666666","lightblue", "mediumvioletred", 
                                   "#99cc00",   "darkblue")) +
@@ -967,7 +982,7 @@ p <- ggplot(ps_grouped, aes(x = sampling_point, y = Relative_abundance, fill = C
   geom_bar(stat = "identity", position = "stack") +
   scale_x_discrete(labels = c( "Burkina Faso","Colombia","Ivory Coast", "Namibia","South Africa 1 (Satara site)","South Africa 2 (Skukuza site)")) +
   scale_fill_manual(values = c("#cc6666", "springgreen4", "#ff9966", "orchid4", "mediumvioletred","lightpink", "#99cc00", "darkblue", "gold1","darkcyan",
-                              "lightblue" ,"firebrick", "#E69F00","#99cc99", "#56B4E9","#666666")) +
+                              "lightblue" , "#E69F00","#99cc99","firebrick","#666666", "#56B4E9")) +
   theme_minimal() +
   theme(legend.title=element_blank()) +
   labs(y = "Relative abundances", x = "") +
@@ -1032,8 +1047,7 @@ model <- ordiR2step(dbrda_lwr, #lower model limit
 
 model$call
 
-dbrda_final <- capscale(formula = taxa_abund_hellinger ~   sand + pH +  
-                          organic_C_N_ratio + organic_matter , data = data.frame(env_stand), distance = "bray")
+dbrda_final <- capscale(formula = taxa_abund_hellinger ~   sclay + pH + total_N + organic_C_N_ratio , data = data.frame(env_stand), distance = "bray")
 summary(dbrda_final)
 
 vif_values <- vif.cca(dbrda_final)
@@ -1092,7 +1106,7 @@ points(sc_si, pch = 21,  bg = palette_specific[sites], cex = 0.8)
 
 set.seed(123)
 #extract env variables
-envfit_res <- envfit(dbrda_final ~ pH + total_N + sand + organic_C_N_ratio, data = env_stand, permutations = 999)
+envfit_res <- envfit(dbrda_final ~ clay + pH + total_N + organic_C_N_ratio, data = env_stand, permutations = 999)
 envfit_res
 envfit_df <- as.data.frame(scores(envfit_res, display = "vectors"))
 envfit_df$Variable <- rownames(envfit_df)
